@@ -58,7 +58,7 @@ if [ "${command}" = "clone" -o "${command}" = "fclone" ] ; then
     fi
   done
   if [ "${pull_extra_base}" != "" ] ; then
-    subrepos_extra="jdk/src/closed jdk/make/closed jdk/test/closed hotspot/src/closed hotspot/test/closed deploy install sponsors pubs"
+    subrepos_extra="jdk/src/closed jdk/make/closed jdk/test/closed hotspot/make/closed hotspot/src/closed hotspot/test/closed deploy install sponsors pubs"
     pull_default_tail=`echo ${pull_default} | sed -e 's@^.*://[^/]*/\(.*\)@\1@'`
     pull_extra="${pull_extra_base}/${pull_default_tail}"
     for i in ${subrepos_extra} ; do
@@ -98,7 +98,8 @@ for i in ${repos} ; do
   (
     (
       if [ "${command}" = "clone" -o "${command}" = "fclone" ] ; then
-        cline="hg clone ${pull_default}/${i} ${i}"
+        pull_newrepo="`echo ${pull_default}/${i} | sed -e 's@\([^:]/\)//*@\1@g'`"
+        cline="hg clone ${pull_newrepo} ${i}"
         echo "# ${cline}"
         ( eval "${cline}" )
       else
@@ -121,7 +122,8 @@ if [ "${repos_extra}" != "" ] ; then
     n=`expr ${n} '+' 1`
     (
       (
-          cline="hg clone ${pull_extra}/${i} ${i}"
+          pull_newextrarepo="`echo ${pull_extra}/${i} | sed -e 's@\([^:]/\)//*@\1@g'`"
+          cline="hg clone ${pull_newextrarepo} ${i}"
           echo "# ${cline}"
           ( eval "${cline}" )
         echo "# exit code $?"
